@@ -1,6 +1,33 @@
 <script setup>
+  import { useLocationStore } from "@/stores/LocationStore";
+  import { useRouter } from "vue-router";
+  import { useToast } from "vue-toastification";
+
+  let location = useLocationStore()
+  let router = useRouter()
+  const toast = useToast()
+
   const handleLocationChanged = (event) => {
-    console.log('location changed', event)
+    location.$patch({
+      destination: {
+        name: event.name,
+        address: event.formatted_address,
+        geometry: {
+          lat: event.geometry.location.lat(),
+          lng: event.geometry.location.lng()
+        }
+      }
+    })
+  }
+
+  const handleSelectedLocation = () => {
+    if (location.destination.name === '') {
+      toast.warning('Please select a location')
+    } else {
+      router.push({
+        name: 'map'
+      })
+    }
   }
 </script>
 
@@ -23,6 +50,7 @@
         <button
           type="button"
           class="inline-flex justify-center rounded-md border border-transparent bg-black py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-gray-600 focus:outline-none"
+          @click="handleSelectedLocation"
         >
           Find A Ride
         </button>
@@ -30,5 +58,3 @@
     </div>
   </div>
 </template>
-
-<style scoped></style>
