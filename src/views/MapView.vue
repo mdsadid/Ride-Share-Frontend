@@ -2,9 +2,12 @@
   import { useLocationStore } from "@/stores/LocationStore";
   import { onMounted, ref } from "vue";
   import { useRouter } from "vue-router";
+  import http from "@/helper/http";
+  import { useToast } from "vue-toastification";
 
-  let location = useLocationStore()
-  let router = useRouter()
+  const location = useLocationStore()
+  const router = useRouter()
+  const toast = useToast()
 
   const gMap = ref(null)
 
@@ -45,7 +48,22 @@
   })
 
   const handleConfirmTrip = () => {
-    console.log('confirm')
+    let data = {
+      origin: location.current.geometry,
+      destination: location.destination.geometry,
+      destination_name: location.destination.name
+    }
+
+    http().post('/api/v1/trip', data)
+      .then(response => {
+        toast.success(response.data.message)
+        router.push({
+          name: 'trip'
+        })
+      })
+      .catch(error => {
+        toast.error(error.response.data.message)
+      })
   }
 </script>
 
@@ -62,7 +80,7 @@
               <GMapMarker :position="location.destination.geometry"/>
             </GMapMap>
           </div>
-          <div class="mt-2">
+          <div class="mt-4">
             <p class="text-xl">
               Going to <strong>{{ location.destination.name }}</strong>
             </p>

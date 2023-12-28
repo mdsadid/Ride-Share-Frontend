@@ -1,9 +1,9 @@
 <script setup>
   import { vMaska } from "maska";
   import { reactive, ref, onMounted, computed } from "vue";
-  import axios from "axios";
   import { useToast } from "vue-toastification";
   import { useRouter } from "vue-router";
+  import http from "@/helper/http";
 
   const credential = reactive({
     phone: null,
@@ -13,6 +13,7 @@
   let isLoading = ref(false)
   let waitingOnVerification = ref(false)
 
+  const toast = useToast()
   const router = useRouter()
 
   onMounted(() => {
@@ -33,9 +34,7 @@
   const handleLogin = () => {
     isLoading.value = true
 
-    const toast = useToast()
-
-    axios.post('http://ride-share.local/api/v1/login', formattedCredentials.value)
+    http().post('/api/v1/login', formattedCredentials.value)
       .then(response => {
         waitingOnVerification.value = true
         toast.success(response.data.message)
@@ -55,9 +54,7 @@
   const handleVerification = () => {
     isLoading.value = true
 
-    const toast = useToast()
-
-    axios.post('http://ride-share.local/api/v1/login/verify', formattedCredentials.value)
+    http().post('/api/v1/login/verify', formattedCredentials.value)
       .then(response => {
         waitingOnVerification.value = false
         localStorage.setItem('token', response.data.token)

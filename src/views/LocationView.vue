@@ -3,7 +3,7 @@
   import { useRouter } from "vue-router";
   import { useToast } from "vue-toastification";
 
-  let location = useLocationStore()
+  const location = useLocationStore()
   let router = useRouter()
   const toast = useToast()
 
