@@ -4,12 +4,22 @@
   import Echo from "laravel-echo";
   import Pusher from "pusher-js";
   import { useTripStore } from "@/stores/TripStore";
+  import http from "@/helper/http";
+  import { useLocationStore } from "@/stores/LocationStore";
+  import { useToast } from "vue-toastification";
+  import { useRouter } from "vue-router";
 
   const title = ref('Waiting For Ride Request...')
   const trip = useTripStore()
   const gMap = ref(null)
+  const location = useLocationStore()
+  const toast = useToast()
+  const router = useRouter()
 
-  onMounted(() => {
+  onMounted(async () => {
+    // comment: get the current location of the driver
+    await location.updateCurrentLocation()
+
     window.Pusher = Pusher
 
     window.Echo = new Echo({
@@ -28,6 +38,7 @@
         trip.$patch(e.trip)
 
         setTimeout(() => {
+          // comment: draw a path on the map
           initMapDirection()
         }, 2000)
       })
@@ -57,6 +68,37 @@
       })
     })
   }
+
+  const handleAcceptTrip = () => {
+    http().patch(`/api/v1/trip/${trip.id}/accept`, {
+      driver_location: location.current.geometry
+    })
+      .then(response => {
+        // comment: update driver destination location to passenger pick-up point
+        location.$patch({
+          destination: {
+            name: 'Pick-Up Passenger',
+            geometry: response.data.data.origin
+          }
+        })
+
+        router.push({
+          name: 'driving'
+        })
+      })
+      .catch(error => {
+        if (error.response.status === 422) {
+          toast.error(error.response.data.errors['driver_location'][0])
+        } else {
+          toast.error(error.response.data.message)
+        }
+      })
+  }
+
+  const handleDeclineTrip = () => {
+    trip.reset()
+    title.value = 'Waiting For Ride Request...'
+  }
 </script>
 
 <template>
@@ -80,10 +122,16 @@
           </div>
         </div>
         <div class="flex justify-between bg-gray-50 px-4 py-3 text-right sm:px-6">
-          <button class="inline-flex justify-center rounded-md border border-transparent bg-black py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-gray-600 focus:outline-none">
+          <button
+            class="inline-flex justify-center rounded-md border border-transparent bg-black py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-gray-600 focus:outline-none"
+            @click="handleAcceptTrip"
+          >
             Accept
           </button>
-          <button class="inline-flex justify-center rounded-md border border-transparent bg-black py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-gray-600 focus:outline-none">
+          <button
+            class="inline-flex justify-center rounded-md border border-transparent bg-black py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-gray-600 focus:outline-none"
+            @click="handleDeclineTrip"
+          >
             Decline
           </button>
         </div>
