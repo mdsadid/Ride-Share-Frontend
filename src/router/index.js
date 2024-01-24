@@ -7,6 +7,7 @@ import TripView from "@/views/TripView.vue";
 import StandbyView from "@/views/StandbyView.vue";
 import DriverView from "@/views/DriverView.vue";
 import DrivingView from "@/views/DrivingView.vue";
+import UserView from "@/views/UserView.vue";
 
 import axios from "axios";
 
@@ -52,6 +53,11 @@ const router = createRouter({
       path: '/driving',
       name: 'driving',
       component: DrivingView
+    },
+    {
+      path: '/user',
+      name: 'user',
+      component: UserView
     }
   ]
 })

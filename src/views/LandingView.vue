@@ -41,9 +41,15 @@
   }
 
   const handleFindRide = () => {
-    router.push({
-      name: 'location'
-    })
+    if (user.name) {
+      router.push({
+        name: 'location'
+      })
+    } else {
+      router.push({
+        name: 'user'
+      })
+    }
   }
 
   const handleLogout = () => {
