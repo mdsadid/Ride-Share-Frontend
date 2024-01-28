@@ -32,7 +32,7 @@
       disableStats: true,
       enabledTransports: ['ws', 'wss'],
     })
-      .channel('trips')
+      .channel('passenger_trip')
       .listen('TripCreated', (e) => {
         title.value = 'Ride Has Requested'
         trip.$patch(e.trip)

@@ -32,5 +32,15 @@ export let useLocationStore = defineStore('location', () => {
     }
   })
 
-  return { current, destination, updateCurrentLocation }
+  const reset = () => {
+    current.geometry.lat = null
+    current.geometry.lng = null
+
+    destination.name = ''
+    destination.address = ''
+    destination.geometry.lat = null
+    destination.geometry.lng = null
+  }
+
+  return { current, destination, updateCurrentLocation, reset }
 })

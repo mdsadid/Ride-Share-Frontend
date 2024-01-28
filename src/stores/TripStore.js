@@ -5,6 +5,9 @@ export let useTripStore = defineStore('trip', () => {
   const id = ref(null)
   const user_id = ref(null)
 
+  const is_started = ref(false)
+  const is_completed = ref(false)
+
   const origin = reactive({
     lat: null,
     lng: null
@@ -17,8 +20,10 @@ export let useTripStore = defineStore('trip', () => {
 
   const destination_name = ref('')
 
-  const is_started = ref(false)
-  const is_completed = ref(false)
+  const driver_location = reactive({
+    lat: null,
+    lng: null,
+  })
 
   const driver = reactive({
     id: null,
@@ -36,6 +41,9 @@ export let useTripStore = defineStore('trip', () => {
     id.value = null
     user_id.value = null
 
+    is_started.value = false
+    is_completed.value = false
+
     origin.lat = null
     origin.lng = null
 
@@ -44,8 +52,8 @@ export let useTripStore = defineStore('trip', () => {
 
     destination_name.value = null
 
-    is_started.value = false
-    is_completed.value = false
+    driver_location.lat = null
+    driver_location.lng = null
 
     driver.id = null
     driver.year = null
@@ -59,12 +67,13 @@ export let useTripStore = defineStore('trip', () => {
   return {
     id,
     user_id,
+    is_started,
+    is_completed,
     origin,
     destination,
     destination_name,
-    reset,
-    is_started,
-    is_completed,
+    driver_location,
     driver,
+    reset,
   }
 })
